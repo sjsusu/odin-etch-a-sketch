@@ -1,12 +1,27 @@
 const grid = document.querySelector(".container");
+let size = 16;
+let rainbow = false;
+let fade = false;
 
 // Make Default 16x16 grid
-makeGrid(16);
+makeGrid(size);
 
 grid.addEventListener("mouseover", (e) => {
     let target = e.target;
     if (target.className === "box") {
-        target.setAttribute("style", "background-color: rgba(0,0,0,0.1);");
+        if (Number(target.style.opacity) !== 0 && fade === true) {
+            target.style.opacity = Number(target.style.opacity) - 0.1;
+        } else if (fade === false) {
+            target.setAttribute("style", "background-color: rgba(0,0,0,0.1);");
+        }
+
+        if (rainbow === true) {
+            let rgbR = randomInt(0, 255);
+            let rgbB = randomInt(0, 255);
+            let rgbG = randomInt(0, 255);
+            target.style.backgroundColor = "rgb( " + rgbR + ", " + rgbB + ", " + rgbG + ")";
+        }
+
     }
 });
 
@@ -17,15 +32,14 @@ gridSize.addEventListener("click", () => {
     let answer = prompt(text);
 
     while (isNaN(answer) || Number(answer) > 100 || Number(answer) < 1) {
-        if (answer === null){
+        if (answer === null) {
             return;
         }
-
         alert("Invalid answer or too large, try again.");
         answer = prompt(text);
     }
 
-    const size = Number(answer);
+    size = Number(answer);
     makeGrid(size);
 
 });
@@ -33,10 +47,37 @@ gridSize.addEventListener("click", () => {
 const clear = document.querySelector(".clear");
 
 clear.addEventListener("click", () => {
-    const boxes = document.querySelectorAll(".box")
+    const boxes = document.querySelectorAll(".box");
 
     for (let box of boxes) {
-        box.setAttribute("style", "background-color: white;");
+        box.setAttribute("style", "background-color: white; opacity: 1;");
+    }
+});
+
+const rainbowButton = document.querySelector(".rainbow");
+rainbowButton.addEventListener("click", (e) => {
+    if (rainbow === true) {
+        rainbow = false;
+        e.target.style.backgroundColor = "rgb(240, 248, 255)";
+        makeGrid(size);
+    } else {
+        rainbow = true;
+        e.target.style.backgroundColor = "rgb(254, 178, 218)";
+        makeGrid(size)
+    }
+
+});
+
+const fadeButton = document.querySelector(".fade");
+fadeButton.addEventListener("click", (e) => {
+    if (fade === true) {
+        fade = false;
+        e.target.style.backgroundColor = "rgb(240, 248, 255)";
+        makeGrid(size);
+    } else {
+        fade = true;
+        e.target.style.backgroundColor = "rgb(155, 185, 210)";
+        makeGrid(size)
     }
 });
 
@@ -49,6 +90,7 @@ function makeGrid(size) {
         for (let j = 0; j < size; j++) {
             let box = document.createElement("div");
             box.classList.add("box");
+            box.style.opacity = 1;
 
             line.appendChild(box);
         }
@@ -56,4 +98,8 @@ function makeGrid(size) {
         grid.appendChild(line);
 
     }
+}
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
